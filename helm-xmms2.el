@@ -67,6 +67,20 @@ If NEXT is non-nil, add it as next played song instead"
   "Insert CANDIDATE as next to be played song."
   (helm-xmms2-append candidate t))
 
+(defmacro helm-xmms2-command (command)
+  (let ((command-name (intern (concat "helm-xmms2-"(symbol-name command) )))
+        (xmms2-arg (downcase (symbol-name command))))
+    `(defun ,command-name (&optional unused)
+       (interactive)
+       (call-process "xmms2" () 0 () ,xmms2-arg))))
+
+(helm-xmms2-command play)
+(helm-xmms2-command pause)
+(helm-xmms2-command toggle)
+(helm-xmms2-command stop)
+(helm-xmms2-command next)
+(helm-xmms2-command prev)
+
 (defvar helm-source-xmms2
   (helm-build-async-source
       "Xmms2"
