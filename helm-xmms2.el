@@ -52,6 +52,32 @@
       (cons (format "%-20s: %-20s: %s" artist album title)
             (list id artist album title)))))
 
+(defun helm-xmms2-playlist-collect-candidates ()
+  "Collect playlist candidates for helm."
+  (let ((pattern (mapcar (lambda (s)
+                           (if (or (string-match "[:~]" s)
+                                   (string-match "^[0-9]+$" s))
+                               s
+                             (concat "~" s)))
+                         (split-string helm-pattern)))
+        (process-connection-type ()))
+    (prog1
+        (apply #'start-process "xmms2" helm-buffer "xmms2" "list" pattern)
+      ())))
+
+(defun helm-xmms2-playlist-filter-one-by-one (candidate)
+  "Filter CANDIDATE for displaying them."
+  (if (stringp candidate)
+      (when (string-match "^\\(  \\|->\\)\\[\\([0-9]+\\)/\\([0-9]+\\)\\] \\(.*\\) - \\(.*\\) (..:..)$" candidate)
+        (let ((pos (match-string 2 candidate))
+              (id (match-string 3 candidate))
+              (current (string= "->" (match-string 1 candidate)))
+              (artist (match-string 4 candidate))
+              (title (match-string 5 candidate)))
+          (cons (format "%s%-3s: %-20s: %s" (match-string 1 candidate) pos artist title)
+                (list id pos artist title))))
+    candidate))
+
 (defun helm-xmms2-append (candidate &optional next)
   "Append CANDIDATE to the xmms2 playlist.
 
@@ -92,10 +118,24 @@ If NEXT is non-nil, add it as next played song instead"
     :action (helm-make-actions "insert next" #'helm-xmms2-insert
                                "append at end" #'helm-xmms2-append)))
 
+(defvar helm-source-xmms2-playlist
+  (helm-build-async-source
+      "Xmms2 Playlist"
+    :header-name "Xmms2 (C-c ? Help)"
+    :candidates-process 'helm-xmms2-playlist-collect-candidates
+    :filter-one-by-one 'helm-xmms2-playlist-filter-one-by-one
+    :candidate-number-limit 9999
+    :action (helm-make-actions "toggle" #'helm-xmms2-toggle
+                               "play" #'helm-xmms2-play
+                               "pause" #'helm-xmms2-pause
+                               "stop" #'helm-xmms2-stop
+                               "next" #'helm-xmms2-next
+                               "prev" #'helm-xmms2-prev)))
+
 (defun helm-xmms2 ()
   "Use helm to manipulate xmms2."
   (interactive)
-  (helm :sources '(helm-source-xmms2)))
+  (helm :sources '(helm-source-xmms2 helm-source-xmms2-playlist)))
 
 (provide 'helm-xmms2)
 
