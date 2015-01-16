@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(defun helm-xmms2-collect-candidates ()
+(defun helm-xmms2-collection-collect-candidates ()
   "Collect candidates for helm."
   (let ((pattern (mapcar (lambda (s)
                            (if (string-match "[:~]" s)
@@ -42,7 +42,7 @@
         (apply #'start-process "xmms2" helm-buffer "xmms2" "search" pattern)
       ())))
 
-(defun helm-xmms2-filter-one-by-one (candidate)
+(defun helm-xmms2-collection-filter-one-by-one (candidate)
   "Filter CANDIDATE for displaying them."
   (when (string-match "^\\([0-9]*?\\) *| \\(.*?\\) *| \\(.*?\\) *| \\(.*?\\) *$" candidate)
     (let ((id (match-string 1 candidate))
@@ -83,10 +83,10 @@ If NEXT is non-nil, add it as next played song instead"
 
 (defvar helm-source-xmms2
   (helm-build-async-source
-      "Xmms2"
+      "Xmms2 Collection"
     :header-name "Xmms2 (C-c ? Help)"
-    :candidates-process 'helm-xmms2-collect-candidates
-    :filter-one-by-one 'helm-xmms2-filter-one-by-one
+    :candidates-process 'helm-xmms2-collection-collect-candidates
+    :filter-one-by-one 'helm-xmms2-collection-filter-one-by-one
     :candidate-number-limit 9999
     :requires-pattern 3
     :action (helm-make-actions "insert next" #'helm-xmms2-insert
