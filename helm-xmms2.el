@@ -6,7 +6,7 @@
 
 ;; Keywords: music tools
 
-;; helm-xmms2 has only been tested with emacs24
+;; helm-xmms2 has only been tested with Emacs 24
 
 ;; helm-xmms2 is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published
@@ -25,12 +25,13 @@
 
 ;; Invoking the `helm-xmms2' command will run a helm session where you
 ;; can select a song to add to xmms2 current playlist.  For now two
-;; acction are available: f1 to instert after currently playing song,
+;; action are available: f1 to insert after currently playing song,
 ;; and f2 to append at end of the playlist.
 
 ;;; Code:
 
 (defun helm-xmms2-collect-candidates ()
+  "Collect candidates for helm."
   (let ((pattern (mapcar (lambda (s)
                            (if (string-match "[:~]" s)
                                s
@@ -42,6 +43,7 @@
       ())))
 
 (defun helm-xmms2-filter-one-by-one (candidate)
+  "Filter CANDIDATE for displaying them."
   (when (string-match "^\\([0-9]*?\\) *| \\(.*?\\) *| \\(.*?\\) *| \\(.*?\\) *$" candidate)
     (let ((id (match-string 1 candidate))
           (artist (match-string 2 candidate))
@@ -51,6 +53,9 @@
             (list id artist album title)))))
 
 (defun helm-xmms2-append (candidate &optional next)
+  "Append CANDIDATE to the xmms2 playlist.
+
+If NEXT is non-nil, add it as next played song instead"
   (let* ((ids (or (mapcar (lambda (candidate) (format "#%s" (car candidate))) (helm-marked-candidates))
                   (list (format "#%s" (car candidate)))))
          (args (if next
@@ -59,6 +64,7 @@
     (apply #'call-process "xmms2" () 0 () "add" args)))
 
 (defun helm-xmms2-insert (candidate)
+  "Insert CANDIDATE as next to be played song."
   (helm-xmms2-append candidate t))
 
 (defvar helm-source-xmms2
@@ -73,5 +79,10 @@
                                "append at end" #'helm-xmms2-append)))
 
 (defun helm-xmms2 ()
+  "Use helm to manipulate xmms2."
   (interactive)
   (helm :sources '(helm-source-xmms2)))
+
+(provide 'helm-xmms2)
+
+;;; helm-xmms2.el ends here
