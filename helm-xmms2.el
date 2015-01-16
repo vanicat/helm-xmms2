@@ -1,6 +1,6 @@
 ;;; helm-xmms2 --- control xmms2 from Emacs
 
-;; Copyright (C) 2014 Rémi Vanicat
+;; Copyright (C) 2014-2015 Rémi Vanicat
 
 ;; Author: Rémi Vanicat      <vanicat@debian.org>
 
