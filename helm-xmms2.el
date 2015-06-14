@@ -40,17 +40,19 @@
         (process-connection-type ()))
     (apply #'start-process "xmms2" helm-buffer "xmms2" "search" pattern)))
 
-(defun helm-xmms2-collection-filter-one-by-one (candidate)
-  "Filter CANDIDATE for displaying them."
-  (when (string-match "^\\([0-9]*?\\) *| \\(.*?\\) *| \\(.*?\\) *| \\(.*?\\) *$" candidate)
-    (let ((id (match-string 1 candidate))
-          (artist (match-string 2 candidate))
-          (album (match-string 3 candidate))
-          (title (match-string 4 candidate)))
-      (cons (format "%-20s: %-20s: %s" artist album title)
-            (list id artist album title)))))
-
-
+(defun helm-xmms2-collection-candidate-transformer (candidates)
+  "Filter CANDIDATES for displaying them."
+  (cl-loop for candidate in candidates
+           for str = (if (consp candidate)
+                         (car candidate)
+                       candidate)
+           if (string-match "^\\([0-9]*?\\) *| \\(.*?\\) *| \\(.*?\\) *| \\(.*?\\) *$" str)
+           collect (let ((id (match-string 1 str))
+                         (artist (match-string 2 str))
+                         (album (match-string 3 str))
+                         (title (match-string 4 str)))
+                     (cons (format "%-20s: %-20s: %s" artist album title)
+                           (list id artist album title)))))
 
 (defun helm-xmms2-playlist-collect-candidates ()
   "Collect playlist candidates for helm."
@@ -63,18 +65,20 @@
         (process-connection-type ()))
     (apply #'start-process "xmms2" helm-buffer "xmms2" "list" pattern)))
 
-(defun helm-xmms2-playlist-filter-one-by-one (candidate)
-  "Filter CANDIDATE for displaying them."
-  (if (stringp candidate)
-      (when (string-match "^\\(  \\|->\\)\\[\\([0-9]+\\)/\\([0-9]+\\)\\] \\(.*\\) - \\(.*\\) (..:..)$" candidate)
-        (let ((pos (match-string 2 candidate))
-              (id (match-string 3 candidate))
-              (current (string= "->" (match-string 1 candidate)))
-              (artist (match-string 4 candidate))
-              (title (match-string 5 candidate)))
-          (cons (format "%s%-3s: %-20s: %s" (match-string 1 candidate) pos artist title)
-                (list id pos artist title))))
-    candidate))
+(defun helm-xmms2-playlist-candidate-transformer (candidates)
+  "Filter CANDIDATES for displaying them."
+  (cl-loop for candidate in candidates
+           for str = (if (consp candidate)
+                         (car candidate)
+                       candidate)
+           if (string-match "^\\(  \\|->\\)\\[\\([0-9]+\\)/\\([0-9]+\\)\\] \\(.*\\) - \\(.*\\) (..:..)$" str)
+           collect (let ((pos (match-string 2 str))
+                         (id (match-string 3 str))
+                         (current (string= "->" (match-string 1 str)))
+                         (artist (match-string 4 str))
+                         (title (match-string 5 str)))
+                     (cons (format "%s%-3s: %-20s: %s" (match-string 1 str) pos artist title)
+                           (list id pos artist title)))))
 
 (defun helm-xmms2-append (candidate &optional next)
   "Append CANDIDATE to the xmms2 playlist.
@@ -110,7 +114,7 @@ If NEXT is non-nil, add it as next played song instead"
       "Xmms2 Collection"
     :header-name "Xmms2 (C-c ? Help)"
     :candidates-process 'helm-xmms2-collection-collect-candidates
-    :filter-one-by-one 'helm-xmms2-collection-filter-one-by-one
+    :candidate-transformer 'helm-xmms2-collection-candidate-transformer
     :candidate-number-limit 9999
     :requires-pattern 3
     :action (helm-make-actions "insert next" #'helm-xmms2-insert
@@ -121,7 +125,7 @@ If NEXT is non-nil, add it as next played song instead"
       "Xmms2 Playlist"
     :header-name "Xmms2 (C-c ? Help)"
     :candidates-process 'helm-xmms2-playlist-collect-candidates
-    :filter-one-by-one 'helm-xmms2-playlist-filter-one-by-one
+    :candidate-transformer 'helm-xmms2-playlist-candidate-transformer
     :candidate-number-limit 9999
     :action (helm-make-actions "toggle" #'helm-xmms2-toggle
                                "play" #'helm-xmms2-play
