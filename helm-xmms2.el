@@ -38,9 +38,7 @@
                              (concat "~" s)))
                          (split-string helm-pattern)))
         (process-connection-type ()))
-    (prog1
-        (apply #'start-process "xmms2" helm-buffer "xmms2" "search" pattern)
-      ())))
+    (apply #'start-process "xmms2" helm-buffer "xmms2" "search" pattern)))
 
 (defun helm-xmms2-collection-filter-one-by-one (candidate)
   "Filter CANDIDATE for displaying them."
@@ -52,6 +50,8 @@
       (cons (format "%-20s: %-20s: %s" artist album title)
             (list id artist album title)))))
 
+
+
 (defun helm-xmms2-playlist-collect-candidates ()
   "Collect playlist candidates for helm."
   (let ((pattern (mapcar (lambda (s)
@@ -61,9 +61,7 @@
                              (concat "~" s)))
                          (split-string helm-pattern)))
         (process-connection-type ()))
-    (prog1
-        (apply #'start-process "xmms2" helm-buffer "xmms2" "list" pattern)
-      ())))
+    (apply #'start-process "xmms2" helm-buffer "xmms2" "list" pattern)))
 
 (defun helm-xmms2-playlist-filter-one-by-one (candidate)
   "Filter CANDIDATE for displaying them."
