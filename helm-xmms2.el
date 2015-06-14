@@ -33,7 +33,7 @@
 (defun helm-xmms2-collection-collect-candidates ()
   "Collect candidates for helm."
   (let ((pattern (mapcar (lambda (s)
-                           (if (string-match "[:~]" s)
+                           (if (string-match "[:~><]" s)
                                s
                              (concat "~" s)))
                          (split-string helm-pattern)))
