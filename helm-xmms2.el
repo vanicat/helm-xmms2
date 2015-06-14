@@ -30,6 +30,12 @@
 
 ;;; Code:
 
+(defcustom helm-xmms2-command "xmms2"
+  "Name of the command used to run xmms2.
+
+Must be in path."
+  :type '(string))
+
 (defun helm-xmms2-collection-collect-candidates ()
   "Collect candidates for helm."
   (let ((pattern (mapcar (lambda (s)
@@ -38,7 +44,7 @@
                              (concat "~" s)))
                          (split-string helm-pattern)))
         (process-connection-type ()))
-    (apply #'start-process "xmms2" helm-buffer "xmms2" "search" pattern)))
+    (apply #'start-process "xmms2" helm-buffer helm-xmms2-command "search" pattern)))
 
 (defun helm-xmms2-collection-candidate-transformer (candidates)
   "Filter CANDIDATES for displaying them."
@@ -63,7 +69,7 @@
                              (concat "~" s)))
                          (split-string helm-pattern)))
         (process-connection-type ()))
-    (apply #'start-process "xmms2" helm-buffer "xmms2" "list" pattern)))
+    (apply #'start-process "xmms2" helm-buffer helm-xmms2-command "list" pattern)))
 
 (defun helm-xmms2-playlist-candidate-transformer (candidates)
   "Filter CANDIDATES for displaying them."
@@ -89,7 +95,7 @@ If NEXT is non-nil, add it as next played song instead"
          (args (if next
                    (cons "-n" ids)
                  ids)))
-    (apply #'call-process "xmms2" () 0 () "add" args)))
+    (apply #'call-process helm-xmms2-command () 0 () "add" args)))
 
 (defun helm-xmms2-insert (candidate)
   "Insert CANDIDATE as next to be played song."
@@ -100,7 +106,7 @@ If NEXT is non-nil, add it as next played song instead"
         (xmms2-arg (downcase (symbol-name command))))
     `(defun ,command-name (&optional unused)
        (interactive)
-       (call-process "xmms2" () 0 () ,xmms2-arg))))
+       (call-process helm-xmms2-command () 0 () ,xmms2-arg))))
 
 (helm-xmms2-command play)
 (helm-xmms2-command pause)
