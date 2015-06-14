@@ -109,7 +109,7 @@ If NEXT is non-nil, add it as next played song instead"
 (helm-xmms2-command next)
 (helm-xmms2-command prev)
 
-(defvar helm-source-xmms2
+(defvar helm-source-xmms2-collection
   (helm-build-async-source
       "Xmms2 Collection"
     :header-name "Xmms2 (C-c ? Help)"
@@ -135,9 +135,9 @@ If NEXT is non-nil, add it as next played song instead"
                                "prev" #'helm-xmms2-prev)))
 
 (defun helm-xmms2 ()
-  "Use helm to manipulate xmms2."
+  "Use helm to control xmms2."
   (interactive)
-  (helm :sources '(helm-source-xmms2 helm-source-xmms2-playlist)))
+  (helm :sources '(helm-source-xmms2-collection helm-source-xmms2-playlist)))
 
 (provide 'helm-xmms2)
 
