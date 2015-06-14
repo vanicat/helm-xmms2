@@ -115,6 +115,14 @@ If NEXT is non-nil, add it as next played song instead"
 (helm-xmms2-command next)
 (helm-xmms2-command prev)
 
+(defun helm-xmms2-goto (candidate)
+  (call-process helm-xmms2-command () 0 () "jump" (cadr candidate)))
+
+(defun helm-xmms2-remove (candidate)
+  (let* ((poss (or (mapcar (lambda (candidate) (format "%s" (cadr candidate))) (helm-marked-candidates))
+                   (list (format "%s" (cadr candidate))))))
+    (apply #'call-process helm-xmms2-command () 0 () "remove" poss)))
+
 (defvar helm-source-xmms2-collection
   (helm-build-async-source
       "Xmms2 Collection"
@@ -133,7 +141,9 @@ If NEXT is non-nil, add it as next played song instead"
     :candidates-process 'helm-xmms2-playlist-collect-candidates
     :candidate-transformer 'helm-xmms2-playlist-candidate-transformer
     :candidate-number-limit 9999
-    :action (helm-make-actions "toggle" #'helm-xmms2-toggle
+    :action (helm-make-actions "jump" #'helm-xmms2-goto
+                               "remove" #'helm-xmms2-remove
+                               "toggle" #'helm-xmms2-toggle
                                "play" #'helm-xmms2-play
                                "pause" #'helm-xmms2-pause
                                "stop" #'helm-xmms2-stop
