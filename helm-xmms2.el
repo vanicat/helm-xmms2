@@ -90,12 +90,15 @@ Must be in path."
   "Append CANDIDATE to the xmms2 playlist.
 
 If NEXT is non-nil, add it as next played song instead"
-  (let* ((ids (or (mapcar (lambda (candidate) (format "#%s" (car candidate))) (helm-marked-candidates))
-                  (list (format "#%s" (car candidate)))))
-         (args (if next
-                   (cons "-n" ids)
-                 ids)))
-    (apply #'call-process helm-xmms2-command () 0 () "add" args)))
+  (let* ((ids (or (-when-let (it (helm-marked-candidates))
+                    (cl-loop for candidate in it
+                             for start = t then ()
+                             if (not start) collect "OR"
+                             collect (format "#%s" (car candidate))))
+                  (list (format "#%s" (car candidate))))))
+    (if next
+        (apply #'call-process helm-xmms2-command () (get-buffer "*Message*") () "add" "-n" ids)
+      ((apply #'call-process helm-xmms2-command () (get-buffer "*Message*") () "add" ids)))))
 
 (defun helm-xmms2-insert (candidate)
   "Insert CANDIDATE as next to be played song."
