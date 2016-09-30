@@ -1,0 +1,10 @@
+#+Title: helm-xmms2 Emacs Package
+
+* This is helm-xmms2
+
+It's a simple extension of Emacs using helm to interact with xmm2.
+
+You should run `helm-xmms2` to search in collection or playlist, you can then append or insert the song you found.
+
+Some other command are available like helm-xmms2-play, helm-xmms2-pause, helm-xmms2-stop, helm-xmms2-next, helm-xmms2-prev that do the obvious
+
