@@ -1,9 +1,11 @@
-;;; helm-xmms2 --- control xmms2 from Emacs
+;;; helm-xmms2.el --- control xmms2 from Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014-2015 Rémi Vanicat
 
 ;; Author: Rémi Vanicat      <vanicat@debian.org>
 
+;; Package-Requires: ((dash "2.11.0"))
+;; Version: 0.0.1
 ;; Keywords: music tools
 
 ;; helm-xmms2 has only been tested with Emacs 24
@@ -30,6 +32,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (defcustom helm-xmms2-command "xmms2"
   "Name of the command used to run xmms2.
 
@@ -153,6 +156,7 @@ If NEXT is non-nil, add it as next played song instead"
                                "next" #'helm-xmms2-next
                                "prev" #'helm-xmms2-prev)))
 
+;;;###autoload
 (defun helm-xmms2 ()
   "Use helm to control xmms2."
   (interactive)
