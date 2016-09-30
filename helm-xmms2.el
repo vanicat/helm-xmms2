@@ -39,15 +39,22 @@
 Must be in path."
   :type '(string))
 
+(defun helm-xmms2-process-sentinel (process event)
+  (helm-process-deferred-sentinel-hook
+   process event (helm-default-directory))
+  ())
+
 (defun helm-xmms2-collection-collect-candidates ()
   "Collect candidates for helm."
-  (let ((pattern (mapcar (lambda (s)
-                           (if (string-match "[:~><]" s)
-                               s
-                             (concat "~" s)))
-                         (split-string helm-pattern)))
-        (process-connection-type ()))
-    (apply #'start-process "xmms2" helm-buffer helm-xmms2-command "search" pattern)))
+  (let* ((pattern (mapcar (lambda (s)
+                            (if (string-match "[:~><]" s)
+                                s
+                              (concat "~" s)))
+                          (split-string helm-pattern)))
+         (process-connection-type ())
+         (proc (apply #'start-process "xmms2" helm-buffer helm-xmms2-command "search" pattern)))
+    (set-process-sentinel proc #'helm-xmms2-process-sentinel)
+    proc))
 
 (defun helm-xmms2-collection-candidate-transformer (candidates)
   "Filter CANDIDATES for displaying them."
@@ -65,14 +72,16 @@ Must be in path."
 
 (defun helm-xmms2-playlist-collect-candidates ()
   "Collect playlist candidates for helm."
-  (let ((pattern (mapcar (lambda (s)
-                           (if (or (string-match "[:~]" s)
-                                   (string-match "^[0-9]+$" s))
-                               s
-                             (concat "~" s)))
-                         (split-string helm-pattern)))
-        (process-connection-type ()))
-    (apply #'start-process "xmms2" helm-buffer helm-xmms2-command "list" pattern)))
+  (let* ((pattern (mapcar (lambda (s)
+                            (if (or (string-match "[:~]" s)
+                                    (string-match "^[0-9]+$" s))
+                                s
+                              (concat "~" s)))
+                          (split-string helm-pattern)))
+         (process-connection-type ())
+         (proc (apply #'start-process "xmms2" helm-buffer helm-xmms2-command "list" pattern)))
+    (set-process-sentinel proc #'helm-xmms2-process-sentinel)
+    proc))
 
 (defun helm-xmms2-playlist-candidate-transformer (candidates)
   "Filter CANDIDATES for displaying them."
